@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Futuristic HUD</title>
+<title>Advanced HUD Upgrade</title>
 <style>
   body { margin: 0; overflow: hidden; background: black; }
 </style>
@@ -15,7 +15,9 @@
 
 <script>
 let scene, camera, renderer;
-let particles, ring1, ring2, core, textMesh;
+let particles, core, textMesh;
+let rings = [];
+let particleRing;
 let mouse = { x: 0, y: 0 };
 let clock = new THREE.Clock();
 
@@ -26,18 +28,18 @@ function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.z = 10;
+  camera.position.z = 12;
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // LIGHTS
-  const light = new THREE.PointLight(0x00ffff, 2);
+  // LIGHT
+  const light = new THREE.PointLight(0xffffff, 2);
   light.position.set(5,5,5);
   scene.add(light);
 
-  // CORE (energy sphere)
+  // CORE
   core = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 32),
     new THREE.MeshStandardMaterial({
@@ -47,24 +49,32 @@ function init() {
   );
   scene.add(core);
 
-  // HUD RINGS
-  ring1 = new THREE.Mesh(
-    new THREE.TorusGeometry(2.5, 0.05, 16, 100),
-    new THREE.MeshBasicMaterial({ color: 0x00ffff })
-  );
+  // MULTIPLE RINGS (7 total)
+  const ringColors = [
+    0x00ffff, // cyan
+    0x00ff99, // green
+    0xff9900, // orange
+    0xffff00, // yellow
+    0xff3300, // red-orange
+    0xffcc00, // gold
+    0xffffff  // white
+  ];
 
-  ring2 = new THREE.Mesh(
-    new THREE.TorusGeometry(3.5, 0.05, 16, 100),
-    new THREE.MeshBasicMaterial({ color: 0x00ff99 })
-  );
+  for (let i = 0; i < 7; i++) {
+    let ring = new THREE.Mesh(
+      new THREE.TorusGeometry(2 + i * 0.5, 0.05, 16, 100),
+      new THREE.MeshBasicMaterial({ color: ringColors[i] })
+    );
 
-  ring2.rotation.x = Math.PI / 2;
+    ring.rotation.x = Math.random() * Math.PI;
+    ring.rotation.y = Math.random() * Math.PI;
 
-  scene.add(ring1);
-  scene.add(ring2);
+    rings.push(ring);
+    scene.add(ring);
+  }
 
-  // PARTICLES
-  const count = 6000;
+  // PARTICLE FIELD
+  const count = 5000;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(count * 3);
 
@@ -82,6 +92,31 @@ function init() {
   particles = new THREE.Points(geometry, material);
   scene.add(particles);
 
+  // PARTICLE RING 🌟
+  const ringCount = 2000;
+  const ringGeo = new THREE.BufferGeometry();
+  const ringPos = new Float32Array(ringCount * 3);
+
+  for (let i = 0; i < ringCount; i++) {
+    let i3 = i * 3;
+    let angle = (i / ringCount) * Math.PI * 2;
+    let radius = 4;
+
+    ringPos[i3] = Math.cos(angle) * radius;
+    ringPos[i3+1] = Math.sin(angle) * radius;
+    ringPos[i3+2] = 0;
+  }
+
+  ringGeo.setAttribute('position', new THREE.BufferAttribute(ringPos, 3));
+
+  const ringMat = new THREE.PointsMaterial({
+    color: 0xffaa00,
+    size: 0.04
+  });
+
+  particleRing = new THREE.Points(ringGeo, ringMat);
+  scene.add(particleRing);
+
   // TEXT
   const loader = new THREE.FontLoader();
   loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
@@ -91,10 +126,10 @@ function init() {
       height: 0.2,
     });
 
-    const textMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     textMesh = new THREE.Mesh(textGeometry, textMaterial);
-    textMesh.position.set(-3, -4, 0);
+    textMesh.position.set(-4, -5, 0);
     scene.add(textMesh);
   });
 
@@ -110,20 +145,28 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
 
-  let elapsed = clock.getElapsedTime();
+  let t = clock.getElapsedTime();
 
   // CORE PULSE
-  let scale = 1 + Math.sin(elapsed * 3) * 0.1;
+  let scale = 1 + Math.sin(t * 3) * 0.1;
   core.scale.set(scale, scale, scale);
 
-  // ROTATIONS
-  ring1.rotation.z += 0.01;
-  ring2.rotation.y += 0.008;
+  // ROTATE ALL RINGS
+  rings.forEach((ring, i) => {
+    ring.rotation.x += 0.005 + i * 0.001;
+    ring.rotation.y += 0.005 + i * 0.001;
+  });
+
+  // PARTICLE FIELD
   particles.rotation.y += 0.0005;
 
+  // PARTICLE RING ROTATION
+  particleRing.rotation.z += 0.01;
+  particleRing.rotation.x = Math.sin(t) * 0.5;
+
   // CAMERA PARALLAX
-  camera.position.x += (mouse.x * 3 - camera.position.x) * 0.05;
-  camera.position.y += (mouse.y * 3 - camera.position.y) * 0.05;
+  camera.position.x += (mouse.x * 4 - camera.position.x) * 0.05;
+  camera.position.y += (mouse.y * 4 - camera.position.y) * 0.05;
   camera.lookAt(scene.position);
 
   renderer.render(scene, camera);
