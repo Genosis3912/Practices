@@ -34,12 +34,10 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // LIGHT
   const light = new THREE.PointLight(0xffffff, 2);
   light.position.set(5,5,5);
   scene.add(light);
 
-  // CORE
   core = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 32),
     new THREE.MeshStandardMaterial({
@@ -49,15 +47,15 @@ function init() {
   );
   scene.add(core);
 
-  // MULTIPLE RINGS (7 total)
+ 
   const ringColors = [
-    0x00ffff, // cyan
-    0x00ff99, // green
-    0xff9900, // orange
-    0xffff00, // yellow
-    0xff3300, // red-orange
-    0xffcc00, // gold
-    0xffffff  // white
+    0x00ffff, 
+    0x00ff99,
+    0xff9900, 
+    0xffff00, 
+    0xff3300,
+    0xffcc00, 
+    0xffffff  
   ];
 
   for (let i = 0; i < 7; i++) {
@@ -73,7 +71,6 @@ function init() {
     scene.add(ring);
   }
 
-  // PARTICLE FIELD
   const count = 5000;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(count * 3);
@@ -92,7 +89,6 @@ function init() {
   particles = new THREE.Points(geometry, material);
   scene.add(particles);
 
-  // PARTICLE RING 🌟
   const ringCount = 2000;
   const ringGeo = new THREE.BufferGeometry();
   const ringPos = new Float32Array(ringCount * 3);
@@ -133,7 +129,6 @@ function init() {
     scene.add(textMesh);
   });
 
-  // MOUSE
   window.addEventListener('mousemove', (e) => {
     mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
     mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -147,24 +142,19 @@ function animate() {
 
   let t = clock.getElapsedTime();
 
-  // CORE PULSE
   let scale = 1 + Math.sin(t * 3) * 0.1;
   core.scale.set(scale, scale, scale);
 
-  // ROTATE ALL RINGS
   rings.forEach((ring, i) => {
     ring.rotation.x += 0.005 + i * 0.001;
     ring.rotation.y += 0.005 + i * 0.001;
   });
 
-  // PARTICLE FIELD
   particles.rotation.y += 0.0005;
 
-  // PARTICLE RING ROTATION
   particleRing.rotation.z += 0.01;
   particleRing.rotation.x = Math.sin(t) * 0.5;
 
-  // CAMERA PARALLAX
   camera.position.x += (mouse.x * 4 - camera.position.x) * 0.05;
   camera.position.y += (mouse.y * 4 - camera.position.y) * 0.05;
   camera.lookAt(scene.position);
