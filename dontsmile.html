@@ -106,7 +106,7 @@
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      animation: shake 1s infinite;
+      animation: shake 0.08s infinite;
       filter: brightness(1.05) contrast(1.2);
     }
 
@@ -149,9 +149,9 @@
 
 <div class="card" id="mainCard">
   <h1>😊 Welcome! 😊</h1>
-  <div class="sub"></div>
-  <button class="surprise-btn" id="scareButton" onclick="playScarySound();">🔘 Click me! 🔘</button>
-  <div class="info-note">✨     ✨</div>
+  <div class="sub">Nothing scary here — just a button</div>
+  <button class="surprise-btn" id="scareButton">🔘 Click me! 🔘</button>
+  <div class="info-note">✨ go ahead, it's safe... or is it? ✨</div>
 </div>
 
 <!-- Jumpscare elements -->
@@ -163,23 +163,18 @@
 <script>
   (function() {
     // ------------------------------------------------------------------
-    // 🔽🔽🔽 PASTE YOUR DIRECT IMAGE LINKS BELOW 🔽🔽🔽
-    // Replace these with your own working image URLs.
-    // The page will pick one at random when the button is clicked.
+    // 🔽🔽🔽 YOUR IMAGE LINKS 🔽🔽🔽
     // ------------------------------------------------------------------
     const IMAGE_URLS = [
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9k2VicGa0PDe-3zGdPRxjr4evBtr8cyDYvQ&s",   // your first link
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9k2VicGa0PDe-3zGdPRxjr4evBtr8cyDYvQ&s",
       "https://play-lh.googleusercontent.com/e7DJKGt5XWSfmusAX1FBtd2Xa3ggAPonVsGukbdH6rVab26fSg40Zmz9xVykKVTlCQ=w240-h480-rw",
       "https://t3.ftcdn.net/jpg/02/99/15/96/360_F_299159695_Dx86xbMqPbcTx5fHL3xwKDGeUJN7IDZM.jpg",
       "https://img.freepik.com/premium-photo/portrait-asian-woman-make-up-ghost-facehorror-scenescary-backgroundhalloween-poster_44277-9211.jpg"
     ];
     
-    // If some links don't work, a fallback image (a funny but startling face) will be used.
     const FALLBACK_IMAGE = "https://media1.tenor.com/m/-waV2kzt2U0AAAAC/scary-face.gif";
+    
     // ------------------------------------------------------------------
-    // ⬆️⬆️⬆️ NO NEED TO EDIT BELOW THIS LINE ⬆️⬆️⬆️
-    // ------------------------------------------------------------------
-
     // DOM elements
     const scareBtn = document.getElementById('scareButton');
     const jumpscareDiv = document.getElementById('jumpscareOverlay');
@@ -187,93 +182,51 @@
     const scaryImg = document.getElementById('scaryImage');
     const mainCardDiv = document.getElementById('mainCard');
 
-    // Audio setup: quick startling "beep scare" sound using Web Audio (works without external files)
-    let audioCtx = null;
-    let startleBuffer = null;
-    let audioAllowed = false;
+    // ---------- PIXABAY SCREAM SOUND (YOUR DOWNLOADED FILE) ----------
+    let pixabayAudioAllowed = false;
+    let screamAudio = null;
 
-    // Create a short, jarring buzz/scream sound
-    function createStartleSound() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      const sampleRate = audioCtx.sampleRate;
-      const duration = 0.7;
-      const bufferSize = sampleRate * duration;
-      const buffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
-      const channel = buffer.getChannelData(0);
-      
-      for (let i = 0; i < bufferSize; i++) {
-        const t = i / sampleRate;
-        // harsh rising tone
-        let freq = 300 + t * 1100;
-        if (freq > 1500) freq = 1500;
-        let tone = Math.sin(2 * Math.PI * freq * t) * (1 - t/duration);
-        let noise = (Math.random() - 0.5) * 0.7;
-        let envelope = Math.min(1.0, t * 20) * (1 - t/duration);
-        let sample = (tone * 0.9 + noise * 0.5) * envelope;
-        sample = Math.max(-0.9, Math.min(0.9, sample * 1.2));
-        channel[i] = sample;
-      }
-      return buffer;
-    }
-
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (!startleBuffer) {
-        startleBuffer = createStartleSound();
+    function initPixabayAudio() {
+      if (!screamAudio) {
+        screamAudio = new Audio();
+        screamAudio.src = 'scream.mp3';  // Make sure this file is in the same folder!
+        screamAudio.preload = 'auto';
+        screamAudio.load();
       }
     }
 
-    function playStartleSound() {
-      if (!audioAllowed) return;
-      if (!audioCtx || !startleBuffer) {
-        initAudio();
-        if (!startleBuffer) return;
+    function playPixabayScream() {
+      if (!pixabayAudioAllowed) return;
+      initPixabayAudio();
+      if (screamAudio) {
+        screamAudio.currentTime = 0;
+        screamAudio.play().catch(e => console.warn("Playback failed:", e));
       }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume().then(() => playNow()).catch(e => console.warn);
-      } else {
-        playNow();
-      }
-    }
-    
-    function playNow() {
-      if (!audioCtx || !startleBuffer) return;
-      try {
-        const source = audioCtx.createBufferSource();
-        source.buffer = startleBuffer;
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.85;
-        source.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        source.start();
-      } catch(e) { console.warn(e); }
     }
 
-    // Enable audio on first user interaction (click anywhere)
-    function enableAudio() {
-      if (audioAllowed) return;
-      initAudio();
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume().then(() => { audioAllowed = true; }).catch(() => {});
-      } else {
-        audioAllowed = true;
+    function enablePixabayAudio() {
+      if (pixabayAudioAllowed) return;
+      initPixabayAudio();
+      pixabayAudioAllowed = true;
+      if (screamAudio) {
+        screamAudio.play().then(() => {
+          screamAudio.pause();
+          screamAudio.currentTime = 0;
+        }).catch(() => {});
       }
     }
-    
+
+    // Enable Pixabay sound on first user interaction
     window.addEventListener('click', function firstClick() {
-      enableAudio();
+      enablePixabayAudio();
       window.removeEventListener('click', firstClick);
     }, { once: true });
     window.addEventListener('touchstart', function firstTouch() {
-      enableAudio();
+      enablePixabayAudio();
       window.removeEventListener('touchstart', firstTouch);
     }, { once: true });
 
-    // Preload images (so they appear instantly)
+    // Preload images
     function preloadAllImages() {
       IMAGE_URLS.forEach(url => {
         const img = new Image();
@@ -284,7 +237,7 @@
     }
     preloadAllImages();
 
-    // State: avoid multiple scares at once
+    // State management
     let isScaring = false;
     let timeoutIds = [];
 
@@ -293,62 +246,48 @@
       timeoutIds = [];
     }
 
-    // Get a random image from the list, fallback if image fails to load
     function getRandomImageUrl() {
       if (!IMAGE_URLS.length) return FALLBACK_IMAGE;
       const randomIndex = Math.floor(Math.random() * IMAGE_URLS.length);
       return IMAGE_URLS[randomIndex];
     }
 
-    // Jump scare routine
+    // Jump scare routine (plays Pixabay scream!)
     function triggerSurprise() {
       if (isScaring) return;
       isScaring = true;
       clearTimeouts();
 
-      // Enable and play sound
-      if (!audioAllowed) {
-        enableAudio();
-        setTimeout(() => playStartleSound(), 10);
-      } else {
-        playStartleSound();
-      }
+      // Play the Pixabay scream sound!
+      playPixabayScream();
 
       // Red flash (quick)
       redFlashDiv.style.opacity = '0.9';
       setTimeout(() => { redFlashDiv.style.opacity = '0'; }, 70);
 
-      // Tiny delay for more impact
       setTimeout(() => {
-        // Select a random scary image
         const imgUrl = getRandomImageUrl();
         scaryImg.src = imgUrl;
         
-        // If image fails to load, use fallback
         scaryImg.onerror = () => {
           if (scaryImg.src !== FALLBACK_IMAGE) {
             scaryImg.src = FALLBACK_IMAGE;
           }
         };
         
-        // Show overlay
         jumpscareDiv.style.visibility = 'visible';
         jumpscareDiv.style.opacity = '1';
         scaryImg.style.animation = 'shake 0.08s infinite';
         
-        // Second red flash
         redFlashDiv.style.opacity = '0.95';
         setTimeout(() => { redFlashDiv.style.opacity = '0'; }, 130);
         
-        // Optional: vibrate for mobile (tiny buzz)
         if (navigator.vibrate) navigator.vibrate(100);
         
-        // Disable button during scare
         mainCardDiv.classList.add('disable-click');
         scareBtn.disabled = true;
         document.body.style.overflow = 'hidden';
         
-        // Hide jumpscare after 1 second
         timeoutIds.push(setTimeout(() => {
           jumpscareDiv.style.transition = 'opacity 0.15s ease-out, visibility 0s linear 0.2s';
           jumpscareDiv.style.opacity = '0';
@@ -356,13 +295,11 @@
             jumpscareDiv.style.visibility = 'hidden';
             jumpscareDiv.style.transition = '';
             scaryImg.style.animation = '';
-            // re-enable button
             mainCardDiv.classList.remove('disable-click');
             scareBtn.disabled = false;
             document.body.style.overflow = '';
             isScaring = false;
             
-            // change button text for a moment (playful)
             const originalText = scareBtn.innerHTML;
             scareBtn.innerHTML = "😱 Gotcha! 😱";
             setTimeout(() => {
@@ -380,79 +317,12 @@
       triggerSurprise();
     });
 
-    // Clean timeouts on page unload
     window.addEventListener('beforeunload', () => {
       clearTimeouts();
     });
     
-    // Small console info
-    console.log("Simple surprise page ready. Click the button for a jumpscare using your images!");
+    console.log("✅ Ready! Make sure 'scream.mp3' is in the same folder as this HTML file.");
   })();
-
-// ---------- PLAY YOUR PIXABAY SCREAM SOUND ----------
-// Make sure you have the sound file named "scream.mp3" in the same folder as your HTML file
-
-(function() {
-    let audioAllowed = false;
-    let screamAudio = null;
-
-    // Create the audio element pointing to YOUR downloaded file
-    function initAudio() {
-        if (!screamAudio) {
-            screamAudio = new Audio();
-            screamAudio.src = 'scream.mp3';  // Make sure this filename matches your downloaded file
-            screamAudio.preload = 'auto';
-            screamAudio.load();
-        }
-    }
-
-    // Play the scary scream
-    function playScaryScream() {
-        if (!audioAllowed) return;
-        
-        initAudio();
-        
-        if (screamAudio) {
-            // Reset the sound to start from beginning if it's already playing
-            screamAudio.currentTime = 0;
-            // Play the scream
-            screamAudio.play().catch(e => {
-                console.warn("Playback failed:", e);
-                // Fallback: try to play after user interaction
-            });
-        }
-    }
-
-    // Enable audio after first user click (browser autoplay policy)
-    function enableAudio() {
-        if (audioAllowed) return;
-        initAudio();
-        audioAllowed = true;
-        // Test play to unlock audio on some browsers
-        if (screamAudio) {
-            screamAudio.play().then(() => {
-                screamAudio.pause();
-                screamAudio.currentTime = 0;
-            }).catch(() => {});
-        }
-    }
-
-    // Listen for first user interaction
-    window.addEventListener('click', function firstClick() {
-        enableAudio();
-        window.removeEventListener('click', firstClick);
-    }, { once: true });
-    
-    window.addEventListener('touchstart', function firstTouch() {
-        enableAudio();
-        window.removeEventListener('touchstart', firstTouch);
-    }, { once: true });
-
-    // Expose the function globally
-    window.playScaryScream = playScaryScream;
-    
-    console.log("Pixabay scream sound ready! Call window.playScaryScream() to play it.");
-})();
 </script>
   
 </body>
