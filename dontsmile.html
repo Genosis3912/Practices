@@ -3,90 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>THE SUMMONING | Horror Jump Scare</title>
+  <title>Simple Surprise Button</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      user-select: none; /* Prevents text selection, adds to the uneasy feel */
     }
 
     body {
       min-height: 100vh;
-      background: radial-gradient(circle at center, #0a0c12 0%, #010101 100%);
+      background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Courier New', 'Creepster', monospace;
-      overflow: hidden;
-      cursor: crosshair;
+      transition: background-color 0.1s ease;
     }
 
-    /* Main container: simple, clean horror stage */
-    .horror-stage {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+    /* Simple, friendly card */
+    .card {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(2px);
+      border-radius: 64px;
+      padding: 3rem 4rem;
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.02);
+      transition: transform 0.2s;
     }
 
-    /* CENTRAL BUTTON — simple and ominous */
-    .dread-button {
-      background: #140606;
-      border: 3px solid #a12222;
-      color: #f0d5b0;
+    h1 {
       font-size: 2.2rem;
-      font-weight: bold;
-      font-family: 'Courier New', monospace;
-      padding: 18px 42px;
-      border-radius: 80px;
-      cursor: pointer;
-      transition: 0.2s;
-      text-transform: uppercase;
-      letter-spacing: 8px;
-      box-shadow: 0 0 25px #5e1a1a, inset 0 0 8px rgba(255, 50, 50, 0.3);
-      z-index: 20;
-      backdrop-filter: blur(4px);
-      background-color: #1c0808cc;
+      font-weight: 600;
+      color: #1e2a3a;
+      margin-bottom: 0.5rem;
     }
 
-    .dread-button:hover {
-      transform: scale(1.02);
-      background: #2c0f0f;
-      border-color: #e34d4d;
-      box-shadow: 0 0 45px #ff2a2a;
+    .sub {
+      font-size: 1rem;
+      color: #4a627a;
+      margin-bottom: 2rem;
+      border-top: 1px solid #cbd5e1;
+      display: inline-block;
+      padding-top: 0.5rem;
+    }
+
+    /* The big, friendly button */
+    .surprise-btn {
+      background: #2c3e66;
+      border: none;
       color: white;
-      letter-spacing: 10px;
-    }
-
-    .dread-button:active {
-      transform: scale(0.98);
-    }
-
-    /* simple eerie subtitle */
-    .whisper {
-      margin-top: 35px;
-      color: #7a5a5a;
-      font-size: 0.85rem;
-      background: #00000066;
-      padding: 6px 16px;
-      border-radius: 40px;
-      backdrop-filter: blur(4px);
+      font-size: 1.8rem;
+      font-weight: 600;
+      padding: 16px 42px;
+      border-radius: 60px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.2s;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
       letter-spacing: 1px;
     }
 
-    /* JUMPSARE OVERLAY (for image or video) */
-    .jumpscare-container {
+    .surprise-btn:hover {
+      background: #1e2f4b;
+      transform: scale(1.02);
+      box-shadow: 0 12px 22px rgba(0, 0, 0, 0.15);
+    }
+
+    .surprise-btn:active {
+      transform: scale(0.98);
+    }
+
+    .info-note {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #7c8ea0;
+      background: #f0f2f5;
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 60px;
+    }
+
+    /* Jumpscare overlay (hidden initially) */
+    .jumpscare-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: black;
+      background: #000;
       z-index: 1000;
       display: flex;
       justify-content: center;
@@ -94,22 +99,20 @@
       visibility: hidden;
       opacity: 0;
       transition: visibility 0s linear 0.05s, opacity 0.08s linear;
-      backdrop-filter: brightness(0.3);
     }
 
-    /* Media (image or video) styling — fills screen while keeping proportions */
-    .scary-media {
+    /* Scary image styling */
+    .scary-img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      animation: violentShake 0.12s infinite;
-      filter: contrast(1.3) brightness(0.95) drop-shadow(0 0 30px crimson);
-      image-rendering: crisp-edges;
+      animation: shake 0.08s infinite;
+      filter: brightness(1.05) contrast(1.2);
     }
 
-    /* intense shake for extra terror */
-    @keyframes violentShake {
-      0% { transform: translate(1px, 1px) rotate(0.3deg); }
+    /* Quick shake effect */
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0.5deg); }
       10% { transform: translate(-1px, -2px) rotate(-0.5deg); }
       20% { transform: translate(-2px, 0px) rotate(0.6deg); }
       30% { transform: translate(2px, 1px) rotate(0deg); }
@@ -122,159 +125,135 @@
       100% { transform: translate(1px, -2px) rotate(0.1deg); }
     }
 
-    /* RED FLASH for instant shock */
+    /* Red flash */
     .red-flash {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(200, 0, 0, 0.85);
+      background: rgba(220, 40, 40, 0.85);
       pointer-events: none;
       z-index: 999;
       opacity: 0;
       transition: opacity 0.02s linear;
     }
 
-    /* subtle background note */
-    .creepy-footer {
-      position: fixed;
-      bottom: 12px;
-      left: 12px;
-      color: #4e2e2e;
-      font-size: 9px;
-      background: #00000066;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-family: monospace;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    /* Disable clicks while jumpscare active */
-    .disable-interaction {
+    /* Disable button during scare */
+    .disable-click {
       pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-<div class="horror-stage" id="horrorStage">
-  <button class="dread-button" id="summonButton">⚡ SUMMON ⚡</button>
-  <div class="whisper">❄️ click only if you are ready to see it ❄️</div>
+<div class="card" id="mainCard">
+  <h1>😊 Welcome! 😊</h1>
+  <div class="sub">Nothing scary here — just a button</div>
+  <button class="surprise-btn" id="scareButton">🔘 Click me! 🔘</button>
+  <div class="info-note">✨ go ahead, it's safe... or is it? ✨</div>
 </div>
 
-<!-- Jumpscare overlay (will display either image or video) -->
-<div class="jumpscare-container" id="jumpscareOverlay">
-  <!-- Media element: we will dynamically switch between <img> and <video> based on your links -->
-  <img id="scaryMedia" class="scary-media" alt="TERROR MANIFEST" style="display: none;">
-  <video id="scaryVideo" class="scary-media" autoplay muted playsinline style="display: none;"></video>
+<!-- Jumpscare elements -->
+<div class="jumpscare-overlay" id="jumpscareOverlay">
+  <img id="scaryImage" class="scary-img" alt="surprise" style="display: block;">
 </div>
 <div class="red-flash" id="redFlash"></div>
-<div class="creepy-footer">⚰️ the veil is thin ⚰️</div>
 
 <script>
   (function() {
-    // --------------------------------------------------------------
-    // 🔻🔻🔻  EASY CUSTOMIZATION ZONE 🔻🔻🔻
-    // REPLACE THESE LINKS WITH YOUR OWN GHOST PICTURES AND VIDEOS
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // 🔽🔽🔽 PASTE YOUR DIRECT IMAGE LINKS BELOW 🔽🔽🔽
+    // Replace these with your own working image URLs.
+    // The page will pick one at random when the button is clicked.
+    // ------------------------------------------------------------------
+    const IMAGE_URLS = [
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9k2VicGa0PDe-3zGdPRxjr4evBtr8cyDYvQ&s",   // your first link
+      "https://play-lh.googleusercontent.com/e7DJKGt5XWSfmusAX1FBtd2Xa3ggAPonVsGukbdH6rVab26fSg40Zmz9xVykKVTlCQ=w240-h480-rw",
+      "https://t3.ftcdn.net/jpg/02/99/15/96/360_F_299159695_Dx86xbMqPbcTx5fHL3xwKDGeUJN7IDZM.jpg",
+      "https://img.freepik.com/premium-photo/portrait-asian-woman-make-up-ghost-facehorror-scenescary-backgroundhalloween-poster_44277-9211.jpg"
+    ];
     
-    // Example ghost image URL (you can replace with any direct image link)
-    const GHOST_IMAGE_URL = "https://cdn.pixabay.com/photo/2020/10/27/19/27/horror-5691482_1280.jpg";
-    
-    // Example ghost video URL (short scary video loop) - replace with your own video link.
-    // Note: The video must be directly accessible (ends with .mp4, .webm, etc.) or a valid blob.
-    const GHOST_VIDEO_URL = "https://cdn.pixabay.com/video/2023/10/18/185775-876080529_large.mp4";
-    
-    // 🧠 INSTRUCTION: 
-    // If you have a specific image link from Google Play or any URL that ends with .jpg/.png/.gif, assign it to GHOST_IMAGE_URL.
-    // If you have a video file link (ends with .mp4, .mov, .webm), assign it to GHOST_VIDEO_URL.
-    // The page will randomly choose between image and video scare each time you click the button (for variety).
-    // You can also set USE_ONLY_IMAGE = true to always show image, or USE_ONLY_VIDEO = true to always show video.
-    
-    const USE_ONLY_IMAGE = false;   // set to true to always show the ghost image
-    const USE_ONLY_VIDEO = false;   // set to true to always show the ghost video
-    
-    // --------------------------------------------------------------
-    // END OF CUSTOMIZATION ZONE — NO NEED TO EDIT BELOW
-    // --------------------------------------------------------------
-    
+    // If some links don't work, a fallback image (a funny but startling face) will be used.
+    const FALLBACK_IMAGE = "https://media1.tenor.com/m/-waV2kzt2U0AAAAC/scary-face.gif";
+    // ------------------------------------------------------------------
+    // ⬆️⬆️⬆️ NO NEED TO EDIT BELOW THIS LINE ⬆️⬆️⬆️
+    // ------------------------------------------------------------------
+
     // DOM elements
-    const summonBtn = document.getElementById('summonButton');
+    const scareBtn = document.getElementById('scareButton');
     const jumpscareDiv = document.getElementById('jumpscareOverlay');
     const redFlashDiv = document.getElementById('redFlash');
-    const scaryImg = document.getElementById('scaryMedia');
-    const scaryVideo = document.getElementById('scaryVideo');
-    const stageDiv = document.getElementById('horrorStage');
-    
-    // Audio setup: terrifying scream using Web Audio (guaranteed to work, no external files)
+    const scaryImg = document.getElementById('scaryImage');
+    const mainCardDiv = document.getElementById('mainCard');
+
+    // Audio setup: quick startling "beep scare" sound using Web Audio (works without external files)
     let audioCtx = null;
-    let screamBuffer = null;
+    let startleBuffer = null;
     let audioAllowed = false;
-    
-    // Function to generate horrifying scream sound
-    function createScreamBuffer() {
+
+    // Create a short, jarring buzz/scream sound
+    function createStartleSound() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
       const sampleRate = audioCtx.sampleRate;
-      const duration = 1.7;
-      const frameCount = sampleRate * duration;
-      const buffer = audioCtx.createBuffer(1, frameCount, sampleRate);
-      const channelData = buffer.getChannelData(0);
+      const duration = 0.7;
+      const bufferSize = sampleRate * duration;
+      const buffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
+      const channel = buffer.getChannelData(0);
       
-      for (let i = 0; i < frameCount; i++) {
+      for (let i = 0; i < bufferSize; i++) {
         const t = i / sampleRate;
-        let freq = 340 + t * 1000;
-        if (freq > 1600) freq = 1600;
-        let scream = Math.sin(2 * Math.PI * freq * t) * (1 - t/duration);
-        let harmonic = Math.sin(2 * Math.PI * (freq * 2.1) * t) * 0.5;
-        let growl = Math.sin(2 * Math.PI * 68 * t) * 0.8 * Math.exp(-t * 3.5);
-        let glitch = (Math.random() - 0.5) * 0.55 * (t < 0.35 ? 0.9 : 0.2);
-        let envelope = Math.min(1.0, t * 14) * (1 - t / duration * 0.75);
-        let sample = (scream * 0.9 + harmonic * 0.7 + growl * 0.8 + glitch) * envelope;
-        sample = Math.max(-0.98, Math.min(0.98, sample * 1.45));
-        channelData[i] = sample;
+        // harsh rising tone
+        let freq = 300 + t * 1100;
+        if (freq > 1500) freq = 1500;
+        let tone = Math.sin(2 * Math.PI * freq * t) * (1 - t/duration);
+        let noise = (Math.random() - 0.5) * 0.7;
+        let envelope = Math.min(1.0, t * 20) * (1 - t/duration);
+        let sample = (tone * 0.9 + noise * 0.5) * envelope;
+        sample = Math.max(-0.9, Math.min(0.9, sample * 1.2));
+        channel[i] = sample;
       }
       return buffer;
     }
-    
+
     function initAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
-      if (!screamBuffer) {
-        screamBuffer = createScreamBuffer();
+      if (!startleBuffer) {
+        startleBuffer = createStartleSound();
       }
     }
-    
-    function playScream() {
+
+    function playStartleSound() {
       if (!audioAllowed) return;
-      if (!audioCtx || !screamBuffer) {
+      if (!audioCtx || !startleBuffer) {
         initAudio();
-        if (!screamBuffer) return;
+        if (!startleBuffer) return;
       }
       if (audioCtx.state === 'suspended') {
-        audioCtx.resume().then(() => playScreamNow()).catch(e => console.warn);
+        audioCtx.resume().then(() => playNow()).catch(e => console.warn);
       } else {
-        playScreamNow();
+        playNow();
       }
     }
     
-    function playScreamNow() {
-      if (!audioCtx || !screamBuffer) return;
+    function playNow() {
+      if (!audioCtx || !startleBuffer) return;
       try {
         const source = audioCtx.createBufferSource();
-        source.buffer = screamBuffer;
+        source.buffer = startleBuffer;
         const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.92;
+        gainNode.gain.value = 0.85;
         source.connect(gainNode);
         gainNode.connect(audioCtx.destination);
         source.start();
       } catch(e) { console.warn(e); }
     }
-    
+
+    // Enable audio on first user interaction (click anywhere)
     function enableAudio() {
       if (audioAllowed) return;
       initAudio();
@@ -285,202 +264,129 @@
       }
     }
     
-    // Enable audio on first user interaction (any click anywhere)
-    window.addEventListener('click', function firstClickHandler() {
+    window.addEventListener('click', function firstClick() {
       enableAudio();
-      window.removeEventListener('click', firstClickHandler);
+      window.removeEventListener('click', firstClick);
     }, { once: true });
-    window.addEventListener('touchstart', function firstTouchHandler() {
+    window.addEventListener('touchstart', function firstTouch() {
       enableAudio();
-      window.removeEventListener('touchstart', firstTouchHandler);
+      window.removeEventListener('touchstart', firstTouch);
     }, { once: true });
-    
-    // Helper: preload image and video resources to make jumpscare instant
-    function preloadMedia() {
-      const img = new Image();
-      img.src = GHOST_IMAGE_URL;
-      if (GHOST_VIDEO_URL) {
-        const videoElem = document.createElement('video');
-        videoElem.preload = 'auto';
-        videoElem.src = GHOST_VIDEO_URL;
-      }
+
+    // Preload images (so they appear instantly)
+    function preloadAllImages() {
+      IMAGE_URLS.forEach(url => {
+        const img = new Image();
+        img.src = url;
+      });
+      const fallbackImg = new Image();
+      fallbackImg.src = FALLBACK_IMAGE;
     }
-    preloadMedia();
-    
-    // State management
+    preloadAllImages();
+
+    // State: avoid multiple scares at once
     let isScaring = false;
-    let activeTimeouts = [];
-    
+    let timeoutIds = [];
+
     function clearTimeouts() {
-      for (let id of activeTimeouts) clearTimeout(id);
-      activeTimeouts = [];
+      for (let id of timeoutIds) clearTimeout(id);
+      timeoutIds = [];
     }
-    
-    // Stop video playback and reset
-    function stopVideo() {
-      scaryVideo.pause();
-      scaryVideo.src = '';
-      scaryVideo.load();
+
+    // Get a random image from the list, fallback if image fails to load
+    function getRandomImageUrl() {
+      if (!IMAGE_URLS.length) return FALLBACK_IMAGE;
+      const randomIndex = Math.floor(Math.random() * IMAGE_URLS.length);
+      return IMAGE_URLS[randomIndex];
     }
-    
-    // Show jumpscare with either image or video based on settings
-    function startJumpScare(useVideo) {
-      // Reset media visibility
-      scaryImg.style.display = 'none';
-      scaryVideo.style.display = 'none';
-      stopVideo();
-      
-      if (useVideo && GHOST_VIDEO_URL) {
-        // Use video jumpscare
-        scaryVideo.src = GHOST_VIDEO_URL;
-        scaryVideo.load();
-        scaryVideo.muted = false;  // unmute for full scare (but autoplay policy may require muted? We'll try with sound)
-        // Note: browsers often block unmuted autoplay, but since user clicked the button and we have audio permission, it's allowed.
-        // For safety we set muted = false and rely on user interaction.
-        scaryVideo.muted = false;
-        scaryVideo.style.display = 'block';
-        // Play video with catch for any autoplay issues
-        const playPromise = scaryVideo.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.warn("Video autoplay prevented, playing muted fallback:", error);
-            scaryVideo.muted = true;
-            scaryVideo.play();
-          });
-        }
-      } else {
-        // Use image jumpscare (fallback if video not available or forced)
-        scaryImg.src = GHOST_IMAGE_URL;
-        scaryImg.style.display = 'block';
-      }
-      
-      // Show overlay and apply shake effect
-      jumpscareDiv.style.visibility = 'visible';
-      jumpscareDiv.style.opacity = '1';
-      
-      const mediaElement = useVideo ? scaryVideo : scaryImg;
-      if (mediaElement) {
-        mediaElement.style.animation = 'violentShake 0.1s infinite';
-      }
-    }
-    
-    // Main scare sequence
-    function triggerJumpScare() {
+
+    // Jump scare routine
+    function triggerSurprise() {
       if (isScaring) return;
       isScaring = true;
       clearTimeouts();
-      
-      // Decide whether to show image or video based on user config and availability
-      let useVideo = false;
-      if (USE_ONLY_IMAGE) useVideo = false;
-      else if (USE_ONLY_VIDEO) useVideo = true;
-      else {
-        // Random choice: 50% image, 50% video (if video URL exists)
-        useVideo = (GHOST_VIDEO_URL && GHOST_VIDEO_URL.length > 0) ? (Math.random() < 0.5) : false;
-      }
-      
-      // If video but no valid video url, fallback to image
-      if (useVideo && (!GHOST_VIDEO_URL || GHOST_VIDEO_URL === "")) {
-        useVideo = false;
-      }
-      
-      // enable & play scream sound
+
+      // Enable and play sound
       if (!audioAllowed) {
         enableAudio();
-        setTimeout(() => playScream(), 10);
+        setTimeout(() => playStartleSound(), 10);
       } else {
-        playScream();
+        playStartleSound();
       }
-      
-      // Red flash pre-scare (intense)
-      redFlashDiv.style.opacity = '0.95';
+
+      // Red flash (quick)
+      redFlashDiv.style.opacity = '0.9';
       setTimeout(() => { redFlashDiv.style.opacity = '0'; }, 70);
-      
-      // Slight delay to build tension
+
+      // Tiny delay for more impact
       setTimeout(() => {
-        startJumpScare(useVideo);
+        // Select a random scary image
+        const imgUrl = getRandomImageUrl();
+        scaryImg.src = imgUrl;
         
-        // Additional red flash during scare
-        redFlashDiv.style.opacity = '1';
-        setTimeout(() => { redFlashDiv.style.opacity = '0'; }, 140);
+        // If image fails to load, use fallback
+        scaryImg.onerror = () => {
+          if (scaryImg.src !== FALLBACK_IMAGE) {
+            scaryImg.src = FALLBACK_IMAGE;
+          }
+        };
         
-        // Vibration for mobile horror
-        if (navigator.vibrate) navigator.vibrate([200, 100, 250]);
+        // Show overlay
+        jumpscareDiv.style.visibility = 'visible';
+        jumpscareDiv.style.opacity = '1';
+        scaryImg.style.animation = 'shake 0.08s infinite';
         
-        // Disable background button
-        stageDiv.classList.add('disable-interaction');
-        summonBtn.disabled = true;
+        // Second red flash
+        redFlashDiv.style.opacity = '0.95';
+        setTimeout(() => { redFlashDiv.style.opacity = '0'; }, 130);
+        
+        // Optional: vibrate for mobile (tiny buzz)
+        if (navigator.vibrate) navigator.vibrate(100);
+        
+        // Disable button during scare
+        mainCardDiv.classList.add('disable-click');
+        scareBtn.disabled = true;
         document.body.style.overflow = 'hidden';
         
-        // Keep jumpscare active for 1.4 seconds then fade out
-        activeTimeouts.push(setTimeout(() => {
-          jumpscareDiv.style.transition = 'opacity 0.2s ease-out, visibility 0s linear 0.25s';
+        // Hide jumpscare after 1 second
+        timeoutIds.push(setTimeout(() => {
+          jumpscareDiv.style.transition = 'opacity 0.15s ease-out, visibility 0s linear 0.2s';
           jumpscareDiv.style.opacity = '0';
-          
           setTimeout(() => {
             jumpscareDiv.style.visibility = 'hidden';
             jumpscareDiv.style.transition = '';
-            // Stop video and reset media
-            stopVideo();
-            scaryImg.style.display = 'none';
-            scaryVideo.style.display = 'none';
-            if (scaryImg) scaryImg.style.animation = '';
-            if (scaryVideo) scaryVideo.style.animation = '';
-            
-            stageDiv.classList.remove('disable-interaction');
-            summonBtn.disabled = false;
+            scaryImg.style.animation = '';
+            // re-enable button
+            mainCardDiv.classList.remove('disable-click');
+            scareBtn.disabled = false;
             document.body.style.overflow = '';
             isScaring = false;
             
-            // After scare: change button text briefly to mess with user
-            const originalText = summonBtn.innerHTML;
-            summonBtn.innerHTML = "👁️ IT SAW YOU 👁️";
+            // change button text for a moment (playful)
+            const originalText = scareBtn.innerHTML;
+            scareBtn.innerHTML = "😱 Gotcha! 😱";
             setTimeout(() => {
-              if (summonBtn && !isScaring) summonBtn.innerHTML = originalText;
-            }, 1500);
-          }, 250);
-        }, 1400));
-      }, 80);
+              if (scareBtn && !isScaring) scareBtn.innerHTML = originalText;
+            }, 1000);
+          }, 180);
+        }, 1000));
+      }, 50);
     }
-    
-    // Attach click event to button
-    summonBtn.addEventListener('click', (e) => {
+
+    // Attach button event
+    scareBtn.addEventListener('click', (e) => {
       e.preventDefault();
       if (isScaring) return;
-      triggerJumpScare();
+      triggerSurprise();
     });
-    
-    // Optional: small flicker ambiance on body to keep tension
-    let ambianceInterval = setInterval(() => {
-      if (!isScaring && Math.random() < 0.12) {
-        const flicker = document.createElement('div');
-        flicker.style.position = 'fixed';
-        flicker.style.top = 0;
-        flicker.style.left = 0;
-        flicker.style.width = '100%';
-        flicker.style.height = '100%';
-        flicker.style.backgroundColor = 'rgba(90, 0, 0, 0.15)';
-        flicker.style.pointerEvents = 'none';
-        flicker.style.zIndex = 50;
-        document.body.appendChild(flicker);
-        setTimeout(() => flicker.remove(), 55);
-      }
-    }, 4000);
-    
-    // Clean intervals on page unload
+
+    // Clean timeouts on page unload
     window.addEventListener('beforeunload', () => {
-      clearInterval(ambianceInterval);
       clearTimeouts();
-      if (scaryVideo) stopVideo();
     });
     
-    // Prevent right-click from ruining experience (optional)
-    document.addEventListener('contextmenu', (e) => {
-      if (!isScaring) e.preventDefault();
-      return false;
-    });
-    
-    console.log("Horror page ready — button in center will trigger jumpscare with YOUR ghost media (replace links in code).");
+    // Small console info
+    console.log("Simple surprise page ready. Click the button for a jumpscare using your images!");
   })();
 </script>
 </body>
