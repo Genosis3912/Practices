@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D Animated Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      overflow-x: hidden;
+      background: #000;
+      color: white;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .section {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 500px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="section">
+  <div class="glass">
+    <h1>3D Background</h1>
+    <p>Scroll down to see animation</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="glass">
+    <h1>Smooth Scroll</h1>
+    <p>3D object reacts to scroll</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="glass">
+    <h1>Modern UI</h1>
+    <p>Glassmorphism + WebGL</p>
+  </div>
+</div>
+
+<!-- Three.js -->
+<script type="module">
+import * as THREE from "https://cdn.skypack.dev/three@0.136";
+
+// Scene
+const scene = new THREE.Scene();
+
+// Camera
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+
+// Renderer
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.querySelector("#bg"),
+  antialias: true
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// Geometry (cool blob-like sphere)
+const geometry = new THREE.IcosahedronGeometry(2, 20);
+
+// Material
+const material = new THREE.MeshStandardMaterial({
+  color: 0x00ffff,
+  wireframe: true
+});
+
+// Mesh
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+// Lights
+const light = new THREE.PointLight(0xffffff, 2);
+light.position.set(5, 5, 5);
+scene.add(light);
+
+// Camera position
+camera.position.z = 5;
+
+// Animation loop
+function animate() {
+  requestAnimationFrame(animate);
+
+  mesh.rotation.x += 0.003;
+  mesh.rotation.y += 0.005;
+
+  renderer.render(scene, camera);
+}
+animate();
+
+// Resize fix
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// Scroll animation
+gsap.to({}, {
+  scrollTrigger: {
+    trigger: document.body,
+    start: "top top",
+    end: "bottom bottom",
+    scrub: true,
+    onUpdate: (self) => {
+      const progress = self.progress;
+      document.querySelector("#bg").style.filter =
+        `hue-rotate(${progress * 360}deg)`;
+    }
+  }
+});
+</script>
+
+</body>
+</html>
