@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>THE HIDDEN WATCHER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* Prevents accidental text selection, adds to the creepy feel */
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #0a0f1e 0%, #03050a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', 'Creepster', 'Courier', monospace;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        /* Main container — the eerie experience */
+        .horror-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+
+        /* The "calm before the storm" UI */
+        .suspense-panel {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            border: 2px solid #6a1e1e;
+            border-radius: 32px;
+            padding: 2rem 3rem;
+            box-shadow: 0 0 40px rgba(180, 20, 20, 0.3), inset 0 0 15px rgba(255, 0, 0, 0.2);
+            z-index: 20;
+            transition: 0.3s;
+            animation: pulseGlow 1.8s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 20px rgba(180, 20, 20, 0.2), inset 0 0 5px rgba(255, 0, 0, 0.1);
+                border-color: #4a1a1a;
+            }
+            100% {
+                box-shadow: 0 0 55px rgba(220, 40, 40, 0.7), inset 0 0 20px rgba(255, 50, 50, 0.4);
+                border-color: #b32424;
+            }
+        }
+
+        .warning-text {
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            color: #c9a87b;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 6px red;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-family: 'Creepster', 'Courier New', monospace;
+            color: #c0392b;
+            text-shadow: 3px 3px 0px #2c0b0b, 0 0 12px #ff0000;
+            margin-bottom: 0.8rem;
+            letter-spacing: 3px;
+        }
+
+        .creepy-message {
+            font-size: 1.1rem;
+            color: #cdc9c2;
+            max-width: 500px;
+            margin: 1rem auto;
+            line-height: 1.5;
+            background: #00000070;
+            padding: 12px 18px;
+            border-radius: 40px;
+            border-left: 3px solid red;
+        }
+
+        .enter-button {
+            background: #1e0a0a;
+            border: 2px solid #a13333;
+            color: #f0c0a0;
+            font-size: 1.8rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            padding: 12px 28px;
+            margin-top: 20px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            box-shadow: 0 0 12px darkred;
+        }
+
+        .enter-button:hover {
+            background: #3a1111;
+            transform: scale(1.02);
+            box-shadow: 0 0 28px red;
+            color: white;
+            border-color: #ff5e5e;
+        }
+
+        /* Jump scare overlay (initially hidden) */
+        .jumpscare-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;  /* hidden by default */
+            opacity: 0;
+            transition: visibility 0s linear 0s, opacity 0.01s linear;
+            backdrop-filter: brightness(0.3);
+        }
+
+        /* The horrifying image & scream effect */
+        .scary-face {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            animation: violentShake 0.12s infinite;
+            filter: contrast(1.4) brightness(0.9) drop-shadow(0 0 20px crimson);
+        }
+
+        /* Shake effect for maximum terror */
+        @keyframes violentShake {
+            0% { transform: translate(1px, 1px) rotate(0.5deg); }
+            10% { transform: translate(-1px, -2px) rotate(-0.5deg); }
+            20% { transform: translate(-2px, 0px) rotate(0.8deg); }
+            30% { transform: translate(2px, 1px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(0.5deg); }
+            50% { transform: translate(-1px, 2px) rotate(-0.3deg); }
+            60% { transform: translate(-2px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-0.5deg); }
+            80% { transform: translate(-1px, -1px) rotate(0.4deg); }
+            90% { transform: translate(1px, 2px) rotate(0.2deg); }
+            100% { transform: translate(1px, -2px) rotate(-0.2deg); }
+        }
+
+        /* Red flash for extra trauma */
+        .red-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.75);
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.03s linear;
+        }
+
+        /* audio permission note - creepy background whispers */
+        .creepy-bg {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            color: #3f2a2a;
+            font-size: 11px;
+            font-family: monospace;
+            background: #00000066;
+            padding: 4px 10px;
+            border-radius: 20px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* flicker effect on suspense panel before jumpscare */
+        .flicker {
+            animation: textFlicker 0.08s infinite !important;
+        }
+
+        @keyframes textFlicker {
+            0% { opacity: 1; text-shadow: 0 0 2px red; }
+            50% { opacity: 0.7; text-shadow: 0 0 12px darkred; }
+            100% { opacity: 1; text-shadow: 0 0 2px red; }
+        }
+
+        /* disable interactions while jumpscare active */
+        .disable-interaction {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="horror-container" id="horrorContainer">
+    <div class="suspense-panel" id="suspensePanel">
+        <div class="warning-text">⚠️ WARNING: PARANORMAL ACTIVITY ⚠️</div>
+        <div class="title">DON'T BLINK</div>
+        <div class="creepy-message">
+            "Something is watching you from the dark corner... <br>
+            Click the button below if you dare to face the truth."
+        </div>
+        <button class="enter-button" id="triggerButton">☠️ SUMMON IT ☠️</button>
+        <div class="creepy-message" style="font-size: 0.7rem; margin-top: 12px;">
+            * psychological hazard * <br> 
+            experience contains sudden loud noise & violent imagery
+        </div>
+    </div>
+</div>
+
+<!-- Jump Scare Overlay (image + scream) -->
+<div class="jumpscare-overlay" id="jumpscareOverlay">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%231a0505'/%3E%3Ccircle cx='400' cy='280' r='140' fill='%23331a1a'/%3E%3Ccircle cx='310' cy='240' r='30' fill='%23f0f0f0'/%3E%3Ccircle cx='490' cy='240' r='30' fill='%23f0f0f0'/%3E%3Ccircle cx='310' cy='240' r='12' fill='%23000000'/%3E%3Ccircle cx='490' cy='240' r='12' fill='%23000000'/%3E%3Cpath d='M340 340 Q400 420 460 340' stroke='%23aa4444' stroke-width='14' fill='none' stroke-linecap='round' /%3E%3Crect x='340' y='380' width='120' height='80' fill='%23442222' /%3E%3Cpath d='M280 170 L350 140 L380 180 L330 200 Z' fill='%23663333' /%3E%3Cpath d='M520 170 L450 140 L420 180 L470 200 Z' fill='%23663333' /%3E%3Ctext x='400' y='500' font-size='50' fill='%23ff3333' text-anchor='middle' font-family='monospace' font-weight='bold'%3EGOT YOU!%3C/text%3E%3C/svg%3E"
+         alt="SCARY FACE" 
+         class="scary-face"
+         id="scaryImage">
+</div>
+<div class="red-flash" id="redFlash"></div>
+<div class="creepy-bg">⚰️ you are being watched ⚰️</div>
+
+<script>
+    (function() {
+        // ----- ELEMENTS -----
+        const triggerBtn = document.getElementById('triggerButton');
+        const jumpscareDiv = document.getElementById('jumpscareOverlay');
+        const redFlashDiv = document.getElementById('redFlash');
+        const suspensePanel = document.getElementById('suspensePanel');
+        const container = document.getElementById('horrorContainer');
+
+        // ----- AUDIO: terrifying scream (web-safe, generated via Web Audio API for guaranteed compatibility and maximum scare)
+        let screamAudioContext = null;
+        let screamBuffer = null;
+        
+        // Pre-create the scream sound using Web Audio (a monstrous, distorted, loud noise)
+        function createScreamBuffer() {
+            if (!screamAudioContext) {
+                screamAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            const sampleRate = screamAudioContext.sampleRate;
+            const duration = 1.6; // seconds of pure horror
+            const frameCount = sampleRate * duration;
+            const buffer = screamAudioContext.createBuffer(1, frameCount, sampleRate);
+            const channelData = buffer.getChannelData(0);
+            
+            // generate a terrifying, glitchy, high-pitched distorted scream + deep growl
+            for (let i = 0; i < frameCount; i++) {
+                const t = i / sampleRate; // time in seconds
+                // base scream frequency: rising shriek
+                let freq = 400 + t * 900;
+                if (freq > 1500) freq = 1500;
+                // main scream oscillator simulation
+                let scream = Math.sin(2 * Math.PI * freq * t) * (1 - t/duration);
+                // add harmonic chaos (square wave-ish distortion)
+                let chaos = Math.sin(2 * Math.PI * (freq * 2.3) * t) * 0.6;
+                let growl = Math.sin(2 * Math.PI * 70 * t) * 0.8 * Math.exp(-t * 3);
+                // random glitch artifacts
+                let glitch = (Math.random() - 0.5) * 0.5 * (t < 0.3 ? 1 : 0);
+                // envelope: sharp attack, slight decay
+                let envelope = Math.min(1.0, t * 8) * (1 - t / duration * 0.7);
+                let sample = (scream * 0.9 + chaos * 0.7 + growl * 0.9 + glitch) * envelope;
+                // clip and distort to make it horrifying
+                sample = Math.max(-0.99, Math.min(0.99, sample * 1.4));
+                // add intense reverb-like tail
+                channelData[i] = sample;
+            }
+            return buffer;
+        }
+
+        let screamSoundReady = false;
+        function initAudio() {
+            if (!screamAudioContext) {
+                screamAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (!screamBuffer) {
+                screamBuffer = createScreamBuffer();
+                screamSoundReady = true;
+            }
+        }
+        
+        // function to play the terrifying scream (must be called after user interaction)
+        let audioAllowed = false;
+        function playScream() {
+            if (!audioAllowed) return;
+            if (!screamAudioContext) {
+                initAudio();
+            }
+            if (screamAudioContext && screamBuffer) {
+                // resume context if suspended (browser autoplay policies)
+                if (screamAudioContext.state === 'suspended') {
+                    screamAudioContext.resume().then(() => {
+                        playScreamNow();
+                    }).catch(e => console.warn("audio resume fail", e));
+                } else {
+                    playScreamNow();
+                }
+            } else {
+                // fallback: try to create on the fly
+                if (screamAudioContext) {
+                    screamBuffer = createScreamBuffer();
+                    playScreamNow();
+                }
+            }
+        }
+        
+        function playScreamNow() {
+            if (!screamAudioContext || !screamBuffer) return;
+            try {
+                const source = screamAudioContext.createBufferSource();
+                source.buffer = screamBuffer;
+                const gainNode = screamAudioContext.createGain();
+                gainNode.gain.value = 0.95; // loud but not destroy speakers
+                source.connect(gainNode);
+                gainNode.connect(screamAudioContext.destination);
+                source.start();
+            } catch(e) { console.warn("scream play failed", e); }
+        }
+        
+        // Enable audio after any user click on page (to satisfy autoplay policies)
+        function enableAudioOnFirstInteraction() {
+            if (audioAllowed) return;
+            initAudio();
+            if (screamAudioContext && screamAudioContext.state === 'suspended') {
+                screamAudioContext.resume().then(() => {
+                    audioAllowed = true;
+                }).catch(() => {});
+            } else {
+                audioAllowed = true;
+            }
+        }
+        
+        // attach global interaction listeners to enable audio quickly
+        window.addEventListener('click', function firstClickHandler() {
+            enableAudioOnFirstInteraction();
+            window.removeEventListener('click', firstClickHandler);
+        }, { once: true });
+        window.addEventListener('touchstart', function firstTouchHandler() {
+            enableAudioOnFirstInteraction();
+            window.removeEventListener('touchstart', firstTouchHandler);
+        }, { once: true });
+        
+        // ----- JUMP SCARE LOGIC (MAXIMUM TERROR) -----
+        let isScaring = false;
+        let timeoutIds = [];
+        
+        function clearTimeouts() {
+            for (let id of timeoutIds) clearTimeout(id);
+            timeoutIds = [];
+        }
+        
+        // The jump scare ritual
+        function triggerJumpScare() {
+            if (isScaring) return;
+            isScaring = true;
+            clearTimeouts();
+            
+            // Pre-enable audio if not yet, then play scream
+            if (!audioAllowed) {
+                enableAudioOnFirstInteraction();
+                // tiny delay so that audio context resumes quickly but scream plays sync
+                setTimeout(() => { playScream(); }, 10);
+            } else {
+                playScream();
+            }
+            
+            // add creepy flicker to panel before hiding (distortion)
+            suspensePanel.classList.add('flicker');
+            
+            // brief red flash pre-shock
+            redFlashDiv.style.opacity = '0.85';
+            setTimeout(() => {
+                redFlashDiv.style.opacity = '0';
+            }, 60);
+            
+            // slight delay for maximum surprise (suspense)
+            setTimeout(() => {
+                // Show the jumpscare overlay with horrific image
+                jumpscareDiv.style.visibility = 'visible';
+                jumpscareDiv.style.opacity = '1';
+                // Also apply extra violent shake to the image container
+                const scaryImg = document.getElementById('scaryImage');
+                if (scaryImg) {
+                    scaryImg.style.animation = 'violentShake 0.08s infinite';
+                }
+                // second red flash to blind
+                redFlashDiv.style.opacity = '0.9';
+                setTimeout(() => {
+                    redFlashDiv.style.opacity = '0';
+                }, 120);
+                
+                // disable background interaction while jumpscare active
+                container.classList.add('disable-interaction');
+                triggerBtn.disabled = true;
+                
+                // make the suspense panel extra faint but hidden behind overlay anyway (overlay covers all)
+                // we also add a terrifying distortion effect
+                document.body.style.overflow = 'hidden';
+                
+                // after 1.2 seconds start fading out jumpscare (still scary)
+                timeoutIds.push(setTimeout(() => {
+                    // smooth exit
+                    jumpscareDiv.style.transition = 'opacity 0.2s ease-out, visibility 0s linear 0.2s';
+                    jumpscareDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        jumpscareDiv.style.visibility = 'hidden';
+                        jumpscareDiv.style.transition = '';
+                        // restore interactions
+                        container.classList.remove('disable-interaction');
+                        triggerBtn.disabled = false;
+                        document.body.style.overflow = '';
+                        suspensePanel.classList.remove('flicker');
+                        // reset image shake
+                        if (scaryImg) scaryImg.style.animation = '';
+                        isScaring = false;
+                        
+                        // after scare, add spooky after-effect text to panel
+                        const creepyMsgDiv = suspensePanel.querySelector('.creepy-message');
+                        const originalMsg = creepyMsgDiv.innerHTML;
+                        creepyMsgDiv.innerHTML = "💀 It touched your soul... 💀<br>Don't look behind you.";
+                        setTimeout(() => {
+                            if (suspensePanel && suspensePanel.contains(creepyMsgDiv)) {
+                                creepyMsgDiv.innerHTML = originalMsg;
+                            }
+                        }, 2500);
+                    }, 220);
+                }, 1500));
+            }, 100);
+        }
+        
+        // But wait ... we also add fake "ghost" interactions: moving the mouse or touching can cause paranoia?
+        // But the main event is triggered by the button, but we also add a hidden easter egg: if user moves mouse too much?
+        // Not needed: the button is enough. But to increase scare, we add 'mouseenter' on body? No, that might be annoying.
+        // However we also add pre-jumpscare tension: change suspense panel text on button hover
+        triggerBtn.addEventListener('mouseenter', () => {
+            if (!isScaring) {
+                const warningDiv = suspensePanel.querySelector('.warning-text');
+                if (warningDiv) warningDiv.innerHTML = "⚠️ IT'S BREATHING DOWN YOUR NECK ⚠️";
+                setTimeout(() => {
+                    if (warningDiv && !isScaring) warningDiv.innerHTML = "⚠️ WARNING: PARANORMAL ACTIVITY ⚠️";
+                }, 700);
+            }
+        });
+        
+        triggerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isScaring) return;
+            // extra effect: vibration if supported
+            if (navigator.vibrate) navigator.vibrate(200);
+            triggerJumpScare();
+        });
+        
+        // Bonus scare: if user tries to leave the page via mouse leaving window? Possibly too intrusive but adds paranoia
+        // Instead add a subtle "shadow movement" but keep it safe. Also ensure double click not re-trigger while active
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && !isScaring) {
+                // Not doing jumpscare but we can alter something subtle: but no, we respect user
+            }
+        });
+        
+        // Preload the scream buffer when user first interacts (already handled)
+        // To make image more frightening, we will replace the SVG with an ultra realistic? Actually the SVG is custom grotesque,
+        // but we can also embed a base64 encoded more horrifying PNG? but svg is guaranteed cross-browser.
+        // However for maximum scare factor, I will add a more terrifying SVG drawing: distorted face with bleeding eyes.
+        // Changing the src dynamically to something way scarier: 
+        const horrifyingSVG = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cdefs%3E%3Cfilter id='blur'%3E%3CfeGaussianBlur stdDeviation='2'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='800' height='600' fill='%23000000'/%3E%3Ccircle cx='400' cy='280' r='170' fill='%23221111'/%3E%3Ccircle cx='290' cy='230' r='38' fill='%23ffffff'/%3E%3Ccircle cx='510' cy='230' r='38' fill='%23ffffff'/%3E%3Ccircle cx='290' cy='230' r='18' fill='%23aa0000'/%3E%3Ccircle cx='510' cy='230' r='18' fill='%23aa0000'/%3E%3Cpath d='M320 330 Q400 450 480 330' stroke='%23ff4444' stroke-width='18' fill='none' stroke-linecap='round' filter='url(%23blur)'/%3E%3Cpath d='M300 350 L340 390 L380 350' fill='%23331111' stroke='%23aa3333' stroke-width='3'/%3E%3Cpath d='M500 350 L460 390 L420 350' fill='%23331111' stroke='%23aa3333' stroke-width='3'/%3E%3Ctext x='400' y='530' font-size='48' fill='%23ff3333' text-anchor='middle' font-family='monospace' font-weight='bold' filter='url(%23blur)'%3EWHYYY%3C/text%3E%3C/svg%3E`;
+        const scaryImgElement = document.getElementById('scaryImage');
+        if (scaryImgElement) {
+            scaryImgElement.src = horrifyingSVG;
+        }
+        
+        // Additionally, to make the initial suspense panel even more nerve-wracking, we add an interval that randomly changes message.
+        let creepyMessages = [
+            "It's right behind the screen...",
+            "Did you hear that?",
+            "Something touched your shoulder.",
+            "Don't turn around.",
+            "Your heart rate increases...",
+            "The eyes are watching...",
+            "Click if you dare...",
+            "It whispers your name."
+        ];
+        let msgInterval;
+        function startSpookyMessageCycle() {
+            msgInterval = setInterval(() => {
+                if (!isScaring && suspensePanel && document.body.contains(suspensePanel)) {
+                    const msgDiv = suspensePanel.querySelector('.creepy-message');
+                    if (msgDiv && !msgDiv.innerHTML.includes("touched your soul")) {
+                        const randomMsg = creepyMessages[Math.floor(Math.random() * creepyMessages.length)];
+                        const originalHTML = msgDiv.innerHTML;
+                        if (!originalHTML.includes("Don't turn around")) {
+                            msgDiv.innerHTML = `"${randomMsg}"<br><span style="font-size:0.7rem;">⚠️</span>`;
+                            setTimeout(() => {
+                                if (msgDiv && !isScaring && !msgDiv.innerHTML.includes("touched your soul")) {
+                                    msgDiv.innerHTML = originalHTML;
+                                }
+                            }, 2800);
+                        }
+                    }
+                }
+            }, 4500);
+        }
+        startSpookyMessageCycle();
+        
+        // Disable right-click to avoid "inspect element" from ruining the scare for a moment (optional)
+        document.addEventListener('contextmenu', (e) => {
+            if (!isScaring) e.preventDefault();
+            return false;
+        });
+        
+        // Safety: remove intervals when page potentially unloads
+        window.addEventListener('beforeunload', () => {
+            if (msgInterval) clearInterval(msgInterval);
+            clearTimeouts();
+        });
+        
+        // final polish: tiny flicker on body sometimes
+        let flickerInterval = setInterval(() => {
+            if (!isScaring && Math.random() < 0.08) {
+                document.body.style.backgroundColor = '#130000';
+                setTimeout(() => document.body.style.backgroundColor = '', 60);
+            }
+        }, 3000);
+        
+        // clean interval on unload
+        window.addEventListener('beforeunload', () => clearInterval(flickerInterval));
+    })();
+</script>
+</body>
+</html>
