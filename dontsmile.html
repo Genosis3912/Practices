@@ -150,7 +150,7 @@
 <div class="card" id="mainCard">
   <h1>😊 Welcome! 😊</h1>
   <div class="sub"></div>
-  <button class="surprise-btn" id="scareButton">🔘 Click me! 🔘</button>
+  <button class="surprise-btn" id="scareButton" onclick="playScarySound();">🔘 Click me! 🔘</button>
   <div class="info-note">✨     ✨</div>
 </div>
 
@@ -388,6 +388,125 @@
     // Small console info
     console.log("Simple surprise page ready. Click the button for a jumpscare using your images!");
   })();
+
+  // ---------- SCARY SOUND MODULE ----------
+// Add this code to your page to enable a terrifying scream sound on button click
+
+(function() {
+    // Create audio context (will be initialized after user interaction)
+    let audioCtx = null;
+    let screamBuffer = null;
+    let soundAllowed = false;
+
+    // Generate a horrifying scream sound using Web Audio
+    function createScreamSound() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        const sampleRate = audioCtx.sampleRate;
+        const duration = 1.5; // 1.5 seconds of terror
+        const frameCount = sampleRate * duration;
+        const buffer = audioCtx.createBuffer(1, frameCount, sampleRate);
+        const channel = buffer.getChannelData(0);
+        
+        for (let i = 0; i < frameCount; i++) {
+            const t = i / sampleRate;
+            // Rising scream frequency
+            let freq = 300 + t * 1200;
+            if (freq > 1800) freq = 1800;
+            
+            // Main scream wave
+            let scream = Math.sin(2 * Math.PI * freq * t) * (1 - t/duration);
+            // High-pitch harmonic for extra terror
+            let harmonic = Math.sin(2 * Math.PI * (freq * 2.3) * t) * 0.6;
+            // Deep demonic growl
+            let growl = Math.sin(2 * Math.PI * 65 * t) * 0.9 * Math.exp(-t * 4);
+            // Random static/glitch
+            let glitch = (Math.random() - 0.5) * 0.6 * (t < 0.4 ? 0.9 : 0.2);
+            // Volume envelope - quick attack, slow decay
+            let envelope = Math.min(1.0, t * 15) * (1 - t / duration * 0.8);
+            
+            let sample = (scream * 0.9 + harmonic * 0.5 + growl * 0.8 + glitch) * envelope;
+            // Clipping for distortion effect
+            sample = Math.max(-0.95, Math.min(0.95, sample * 1.4));
+            channel[i] = sample;
+        }
+        return buffer;
+    }
+
+    // Initialize audio system
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (!screamBuffer) {
+            screamBuffer = createScreamSound();
+        }
+    }
+
+    // Play the scary scream
+    function playScarySound() {
+        if (!soundAllowed) return;
+        if (!audioCtx || !screamBuffer) {
+            initAudio();
+            if (!screamBuffer) return;
+        }
+        
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume().then(() => {
+                playSoundNow();
+            }).catch(e => console.warn("Audio resume failed", e));
+        } else {
+            playSoundNow();
+        }
+    }
+
+    function playSoundNow() {
+        if (!audioCtx || !screamBuffer) return;
+        try {
+            const source = audioCtx.createBufferSource();
+            source.buffer = screamBuffer;
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0.9; // Loud but safe volume
+            source.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            source.start();
+        } catch(e) {
+            console.warn("Sound play failed", e);
+        }
+    }
+
+    // Enable sound after user clicks anywhere (browser autoplay policy)
+    function enableSound() {
+        if (soundAllowed) return;
+        initAudio();
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().then(() => {
+                soundAllowed = true;
+            }).catch(() => {});
+        } else {
+            soundAllowed = true;
+        }
+    }
+
+    // Listen for first user interaction
+    window.addEventListener('click', function firstClick() {
+        enableSound();
+        window.removeEventListener('click', firstClick);
+    }, { once: true });
+    
+    window.addEventListener('touchstart', function firstTouch() {
+        enableSound();
+        window.removeEventListener('touchstart', firstTouch);
+    }, { once: true });
+
+    // Expose the play function globally so your button can call it
+    window.playScarySound = playScarySound;
+    
+    console.log("Scary sound ready! Call window.playScarySound() to trigger the scream.");
+})();
 </script>
+  
 </body>
 </html>
